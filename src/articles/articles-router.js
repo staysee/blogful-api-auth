@@ -1,5 +1,6 @@
 const express = require('express')
 const ArticlesService = require('./articles-service')
+const { requireAuth } = require('../middleware/basic-auth')
 
 const articlesRouter = express.Router()
 
@@ -8,6 +9,7 @@ articlesRouter
   .get((req, res, next) => {
     ArticlesService.getAllArticles(req.app.get('db'))
       .then(articles => {
+        console.log(articles)
         res.json(articles.map(ArticlesService.serializeArticle))
       })
       .catch(next)
@@ -15,12 +17,14 @@ articlesRouter
 
 articlesRouter
   .route('/:article_id')
+  .all(requireAuth)
   .all(checkArticleExists)
   .get((req, res) => {
     res.json(ArticlesService.serializeArticle(res.article))
   })
 
 articlesRouter.route('/:article_id/comments/')
+  .all(requireAuth)
   .all(checkArticleExists)
   .get((req, res, next) => {
     ArticlesService.getCommentsForArticle(
