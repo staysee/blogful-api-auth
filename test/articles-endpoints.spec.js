@@ -54,6 +54,14 @@ describe('Articles Endpoints', function() {
           .set('Authorization', makeAuthHeader(userNoCreds))
           .expect(401, { error: `Unauthorized request` })
       })
+
+      it(`responds 401 'Unauthorized request' when invalid user`, () => {
+        const userInvalidCreds = { user_name: 'user-not', password: 'existy' }
+        return supertest(app)
+          .get(`/api/articles/1`)
+          .set('Authorization', makeAuthHeader(userInvalidCreds))
+          expect(401, { error: `Unauthorized request` })
+      })
     })
   })
 
