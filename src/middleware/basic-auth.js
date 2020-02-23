@@ -18,8 +18,19 @@ function requireAuth(req, res, next) {
     if (!tokenUserName || !tokenPassword) {
       return res.status(401).json({ error: 'Unauthorized request' })
     }
-    
-    next()
+
+    //query database for a user matching this username
+    req.app.get('db')('blogful_users')
+      .where({ user_name: tokenUserName })
+      .first()
+      .then(user => {
+        //check password
+        if (!user || user.password !== tokenPassword) {
+          return res.status(401).json({ error: 'Unauthorized request' })
+        }
+        next()
+      })
+      .catch(next)
   }
   
   module.exports = {
