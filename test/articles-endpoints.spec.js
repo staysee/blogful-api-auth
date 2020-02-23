@@ -11,10 +11,10 @@ describe('Articles Endpoints', function() {
     testComments,
   } = helpers.makeArticlesFixtures()
 
-  function makeAuthHeader(user) {
-    const token = Buffer.from(`${user.user_name}:${user.password}`).toString('base64')
-    return `Basic ${token}`
-  }
+  // function makeAuthHeader(user) {
+  //   const token = Buffer.from(`${user.user_name}:${user.password}`).toString('base64')
+  //   return `Basic ${token}`
+  // }
 
   before('make knex instance', () => {
     db = knex({
@@ -63,7 +63,7 @@ describe('Articles Endpoints', function() {
           const userNoCreds = { user_name: '', password: '' }
           return supertest(app)
             .get(endpoint.path)
-            .set('Authorization', makeAuthHeader(userNoCreds))
+            .set('Authorization', helpers.makeAuthHeader(userNoCreds))
             .expect(401, { error: `Unauthorized request` })
         })
 
@@ -71,7 +71,7 @@ describe('Articles Endpoints', function() {
           const userInvalidCreds = { user_name: 'user-not', password: 'existy' }
           return supertest(app)
             .get(endpoint.path)
-            .set('Authorization', makeAuthHeader(userInvalidCreds))
+            .set('Authorization', helpers.makeAuthHeader(userInvalidCreds))
             .expect(401, { error: `Unauthorized request` })
         })
 
@@ -79,7 +79,7 @@ describe('Articles Endpoints', function() {
           const userInvalidPass = { user_name: testUsers[0].user_name, password: 'wrong' }
           return supertest(app)
             .get(endpoint.path)
-            .set('Authorization', makeAuthHeader(userInvalidPass))
+            .set('Authorization', helpers.makeAuthHeader(userInvalidPass))
             .expect(401, { error: `Unauthorized request` })
         })
       })
@@ -91,7 +91,7 @@ describe('Articles Endpoints', function() {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/articles')
-          .set(`Authorization`, makeAuthHeader(testUsers[0]))
+          .set(`Authorization`, helpers.makeAuthHeader(testUsers[0]))
           .expect(200, [])
       })
     })
@@ -157,7 +157,7 @@ describe('Articles Endpoints', function() {
         const articleId = 123456
         return supertest(app)
           .get(`/api/articles/${articleId}`)
-          .set(`Authorization`, makeAuthHeader(testUsers[0]))
+          .set(`Authorization`, helpers.makeAuthHeader(testUsers[0]))
           .expect(404, { error: `Article doesn't exist` })
       })
     })
@@ -182,7 +182,7 @@ describe('Articles Endpoints', function() {
 
         return supertest(app)
           .get(`/api/articles/${articleId}`)
-          .set(`Authorization`, makeAuthHeader(testUsers[0]))
+          .set(`Authorization`, helpers.makeAuthHeader(testUsers[0]))
           .expect(200, expectedArticle)
       })
     })
@@ -206,7 +206,7 @@ describe('Articles Endpoints', function() {
         return supertest(app)
           .get(`/api/articles/${maliciousArticle.id}`)
           //use the testUser seeded above
-          .set(`Authorization`, makeAuthHeader(testUser))
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect(res => {
             expect(res.body.title).to.eql(expectedArticle.title)
@@ -226,7 +226,7 @@ describe('Articles Endpoints', function() {
         const articleId = 123456
         return supertest(app)
           .get(`/api/articles/${articleId}/comments`)
-          .set('Authorization', makeAuthHeader(testUsers[0]))
+          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .expect(404, { error: `Article doesn't exist` })
       })
     })
@@ -249,7 +249,7 @@ describe('Articles Endpoints', function() {
 
         return supertest(app)
           .get(`/api/articles/${articleId}/comments`)
-          .set('Authorization', makeAuthHeader(testUsers[0]))
+          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .expect(200, expectedComments)
       })
     })
