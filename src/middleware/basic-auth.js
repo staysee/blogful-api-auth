@@ -1,3 +1,5 @@
+const AuthService = require('../auth/auth-service')
+
 function requireAuth(req, res, next) {
     // console.log('requireAuth')
     // console.log(req.get('Authorization'))
@@ -10,19 +12,16 @@ function requireAuth(req, res, next) {
       basicToken = authToken.slice('basic '.length, authToken.length)
     }
 
-    const [tokenUserName, tokenPassword] = Buffer
-      .from(basicToken, 'base64')
-      .toString()
-      .split(':')
+    const [tokenUserName, tokenPassword] = AuthService.parseBasicToken(basicToken)
     
     if (!tokenUserName || !tokenPassword) {
       return res.status(401).json({ error: 'Unauthorized request' })
     }
 
     //query database for a user matching this username
-    req.app.get('db')('blogful_users')
-      .where({ user_name: tokenUserName })
-      .first()
+    AuthService.getUserWithUserName(
+      req.app.get('db'), tokenUserName
+    )
       .then(user => {
         //check password
         if (!user || user.password !== tokenPassword) {
