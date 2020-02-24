@@ -48,7 +48,7 @@ describe.only(`Protected endpoints`, () => {
       },
       {
         name: 'POST /api/comments',
-        path: 'api/comments',
+        path: '/api/comments',
         method: supertest(app).post
       }
     ]
