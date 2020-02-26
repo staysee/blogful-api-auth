@@ -30,7 +30,6 @@ describe('Articles Endpoints', function() {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/articles')
-          // .set(`Authorization`, helpers.makeAuthHeader(testUsers[0]))
           .expect(200, [])
       })
     })
