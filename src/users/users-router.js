@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const { comparePasswords } = require('../auth/auth-service')
 const UsersService = require('./users-service')
 
@@ -7,7 +8,7 @@ const jsonBodyParser = express.json()
 
 usersRouter
 .post('/', jsonBodyParser, (req, res, next) => {
-    const { password, user_name } = req.body
+    const { password, user_name, full_name, nickname } = req.body
 
     for (const field of ['full_name', 'user_name', 'password'])
         if (!req.body[field])
@@ -28,7 +29,24 @@ usersRouter
                     if (hasUserWithUserName)
                         return res.status(400).json({ error: `Username already taken` })
                     
-                    res.send('ok')
+                    const newUser = {
+                        user_name,
+                        password,
+                        full_name,
+                        nickname,
+                        date_created: 'now()',
+                    }
+
+                    return UsersService.insertUser(
+                        req.app.get('db'),
+                        newUser
+                    )
+                    .then(user => {
+                        res
+                            .status(201)
+                            .location(path.posix.join(req.originalUrl, `/${user.id}`))
+                            .json(UsersService.serializeUser(user))
+                    })
                 })
                 .catch(next)
 })
