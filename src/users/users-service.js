@@ -1,4 +1,5 @@
 const xss = require('xss')
+const bcrypt = require('bcryptjs')
 
 const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
 
@@ -31,6 +32,9 @@ const UsersService = {
             return 'Password must contain 1 upper case, lower case, number and special character'
         }
         return null
+    },
+    hashPassword(password) {
+        return bcrypt.hash(password, 12)
     },
     serializeUser(user) {
         return {
