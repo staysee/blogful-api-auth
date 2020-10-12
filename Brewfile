@@ -1,0 +1,7 @@
+tap "heroku/brew"
+tap "homebrew/bundle"
+tap "homebrew/core"
+brew "node"
+brew "postgresql"
+brew "tree"
+brew "heroku/brew/heroku"
